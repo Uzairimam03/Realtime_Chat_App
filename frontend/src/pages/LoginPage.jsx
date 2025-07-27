@@ -3,8 +3,12 @@ import { useAuthStore } from '../store/useAuthStore';
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AuthImagePattern from '../components/AuthImagePattern'
-const LoginPage = () => {
 
+
+
+const LoginPage = () => {
+ 
+//normal
   const [showPassword, setShowPassword] = useState(false) 
   const [ formData, setFormData] = useState ({
     email: "",
@@ -111,6 +115,25 @@ const LoginPage = () => {
         title={"Welcome back!"}
         subtitle={"Sign in to continue your conversations and catch up with your messages."}
       />
+
+<div className=' flex items-center justify-center h-4'>
+      <button
+        onClick={() => window.location.href = "http://localhost:5001/api/auth/google"}
+        className="bg-white flex items-center justify-center gap-2 text-gray-700 border border-gray-300 rounded-lg px-5 py-3 shadow hover:shadow-md transition hover:bg-gray-50"
+      >
+        <img
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          alt="Google icon"
+          className="w-5 h-5"
+        />
+        <span className="text-sm font-medium">Sign in with Google</span>
+      </button>
+    </div>
+  
+
+
+
+      
     </div>
   )
 }

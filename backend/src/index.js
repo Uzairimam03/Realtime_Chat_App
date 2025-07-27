@@ -9,8 +9,29 @@ import { protectRoute } from "./middleware/auth.middleware.js";
 import cors from "cors"
 import path from "path"
 import { app, server } from "./lib/socket.js"
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import passport from "passport";
+import "./auth/google.js"; //
+
 
 dotenv.config();
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+  cookie: {
+    secure: false, // true if using HTTPS
+    httpOnly: true,
+   sameSite: "lax",
+  }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 const PORT = process.env.PORT;
 const __dirname = path.resolve();
@@ -38,4 +59,5 @@ if (process.env.NODE_ENV === "production") {
 server.listen(PORT, () => {
   console.log("server is running on PORT:" + PORT);
   connectDB();
+  
 });
