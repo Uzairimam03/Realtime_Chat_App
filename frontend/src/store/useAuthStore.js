@@ -8,7 +8,7 @@ import { io } from "socket.io-client";
 const BASE_URL =
   import.meta.env.MODE === "development"
     ? "http://localhost:5001"
-    : "https://realtime-chat-app-rtww.onrender.com";
+    : (import.meta.env.VITE_API_URL || "https://realtime-chat-app-rtww.onrender.com").replace("/api", "");
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   isSigningUp: false,
@@ -40,7 +40,7 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data })
       toast.success("Account created successfully");
     } catch (error) {
-      toast.error(error.response.data.message)
+      toast.error(error.response?.data?.message || error.message || "Signup failed")
     } finally {
       set({ isSigningUp: false });
     }
@@ -56,7 +56,7 @@ export const useAuthStore = create((set, get) => ({
       get().connectSocket()
 
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || error.message || "Login failed");
     } finally {
       set({ isLoggingIn: false });
     }
@@ -69,7 +69,7 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Logout Successfully");
       get().disconnectSocket()
     } catch (error) {
-      toast.error(error.response.data.message)
+      toast.error(error.response?.data?.message || error.message || "Logout failed")
     }
   },
 
@@ -81,7 +81,7 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Profile updated successfully");
     } catch (error) {
       console.log("error in update profile:", error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || error.message || "Profile update failed");
     } finally {
       set({ isUpdatingProfile: false });
     }
