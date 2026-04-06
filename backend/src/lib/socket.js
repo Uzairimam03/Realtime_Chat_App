@@ -6,9 +6,14 @@ import { log } from "console";
 const app = express();
 const server = http.createServer(app)
 
+const socketOrigins = process.env.CLIENT_URL
+  ? [process.env.CLIENT_URL, "http://localhost:5173"]
+  : true;
+
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: socketOrigins,
+    credentials: true,
   }
 });
 
