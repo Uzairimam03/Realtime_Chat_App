@@ -16,7 +16,7 @@ const Sidebar = () => {
   }, [getUsers]);
 
   const filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user._id))
+    ? users.filter((user) => onlineUsers.includes(user._id.toString()))
     : users;
 
   if (isUsersLoading) return <SidebarSkeleton />;
@@ -49,7 +49,7 @@ const Sidebar = () => {
       </div>
       <div className="overflow-y-auto w-full py-3">
         {filteredUsers.map((user) => {
-          const isOnline = onlineUsers.includes(user._id);
+          const isOnline = onlineUsers.includes(user._id.toString());
           console.log(`User ${user.fullName} is online:`, isOnline);
 
           return (
