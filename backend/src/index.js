@@ -20,15 +20,21 @@ const __dirname = path.dirname(__filename);
 
 app.use(express.json());
 app.use(cookieParser());
+
 const allowedOrigins = process.env.CLIENT_URL
   ? [process.env.CLIENT_URL, "http://localhost:5173"]
-  : null;
+  : ["http://localhost:5173"];
+
+if (process.env.NODE_ENV === "production" && !process.env.CLIENT_URL) {
+  console.warn("⚠️  CLIENT_URL not set in production - CORS may fail");
+}
 
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
-      if (!allowedOrigins || allowedOrigins.includes(origin)) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      console.warn(`CORS rejected origin: ${origin}. Allowed: ${allowedOrigins.join(", ")}`);
       return callback(new Error(`CORS policy denied access from ${origin}`));
     },
     credentials: true,

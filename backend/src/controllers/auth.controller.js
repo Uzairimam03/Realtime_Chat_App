@@ -83,12 +83,17 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    res.cookie("jwt", "", { 
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = {
       maxAge: 0,
       httpOnly: true,
-      sameSite: "none",
-      secure: process.env.NODE_ENV === "production"
-    })
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    };
+    if (isProduction) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN || undefined;
+    }
+    res.cookie("jwt", "", cookieOptions);
     res.status(200).json({
       message: "Logout Successfully"
     })
