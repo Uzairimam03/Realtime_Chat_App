@@ -6,28 +6,20 @@ import { connectDB } from "./lib/db.js"
 import process from "process"
 import cookieParser from "cookie-parser";
 import cors from "cors"
-import path from "path"
-import { fileURLToPath } from "url"
-import fs from "fs"
 import { app, server } from "./lib/socket.js"
 
 dotenv.config();
 
 const PORT = process.env.PORT || 5001;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = process.env.CLIENT_URL
-  ? [process.env.CLIENT_URL, "http://localhost:5173"]
-  : ["http://localhost:5173"];
-
-if (process.env.NODE_ENV === "production" && !process.env.CLIENT_URL) {
-  console.warn("⚠️  CLIENT_URL not set in production - CORS may fail");
-}
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://realtime-chat-app-ten-alpha.vercel.app",
+  ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : []),
+];
 
 app.use(
   cors({
@@ -44,40 +36,7 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-if (process.env.NODE_ENV === "production") {
-  // Try multiple possible paths
-  const possiblePaths = [
-    path.join(__dirname, "..", "..", "frontend", "dist"),
-    path.join(__dirname, "..", "frontend", "dist"),
-    path.join(process.cwd(), "frontend", "dist")
-  ];
-  
-  let frontendDistPath = null;
-  
-  for (const testPath of possiblePaths) {
-    console.log("Testing path:", testPath);
-    if (fs.existsSync(testPath)) {
-      frontendDistPath = testPath;
-      console.log("✓ Found dist folder at:", frontendDistPath);
-      break;
-    }
-  }
-  
-  if (!frontendDistPath) {
-    console.error("❌ Could not find frontend/dist folder!");
-    console.log("Current directory:", process.cwd());
-    console.log("__dirname:", __dirname);
-  } else {
-    app.use(express.static(frontendDistPath));
-
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(frontendDistPath, "index.html"));
-    });
-  }
-}
-
 server.listen(PORT, () => {
   console.log("Server is running on PORT:", PORT);
-  console.log("Current working directory:", process.cwd());
   connectDB();
 });
