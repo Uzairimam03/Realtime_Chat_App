@@ -2,19 +2,23 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+
+const __filename = fileURLToPath(import.meta.url);  // ← add this
+const __dirname = path.dirname(__filename);  
 
 export default defineConfig({
   plugins: [
     react(),
-    nodePolyfills() // Node polyfills for modules like crypto, stream, etc.
+    nodePolyfills(),
   ],
 
-  // ✅ Base path for assets, critical for static hosting like Render
   base: '/',
 
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'), // optional, for clean imports
+      '@': path.resolve(__dirname, 'src'),
     },
   },
 
@@ -30,13 +34,17 @@ export default defineConfig({
   },
 
   build: {
-    outDir: 'dist', // default output folder
+    outDir: 'dist',
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
-      // Only externalize libraries if you know they will be loaded globally
-      // external: ['url', 'cloudinary'], 
-    },
-    define: {
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          socket: ["socket.io-client"],
+          ui: ["react-hot-toast"],
+          store: ["zustand"],
+        },
+      },
     },
   },
 
