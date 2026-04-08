@@ -7,5 +7,13 @@ const BASE_URL =
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+});
+
+// Attach token from localStorage to every request
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("chat-token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
